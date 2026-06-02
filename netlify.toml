@@ -1,0 +1,27 @@
+# Netlify configuration for the Manifest PoC.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Single-page app: every route falls back to index.html so /me, /public and
+# /court resolve client-side.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Hardening headers. Note: the strongest privacy guarantees live in the client
+# (no cookies, no storage, no analytics); these headers reduce metadata leakage
+# at the edge.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+    Cache-Control = "no-store"
