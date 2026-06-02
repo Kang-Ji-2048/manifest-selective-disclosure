@@ -7,3 +7,4 @@ dist-ssr
 .env.*
 .vite
 vite.config.js.timestamp-*.mjs
+.claude

@@ -127,26 +127,87 @@ export const AUDIENCES = [
 ];
 
 // ---- Public / funder aggregates ----
-// Each figure is differentially-private and carries an independently
-// verifiable zero-knowledge count proof.
+// Each figure is differentially-private (Laplace mechanism, ε below) and carries
+// an independently verifiable zero-knowledge count proof. Figures are released as
+// a noised point ± a 95% interval, or as a lower bound (≥ N) where a crisp value
+// would be too precise. Cohorts smaller than `minCohort` are suppressed entirely
+// (cohort / spatial k-anonymity) — never jittered.
 export const aggregate = {
   window: "01 Jan – 31 May 2026",
   epsilon: 1.1,
+  minCohort: 20, // k-anonymity threshold: any cell below this is suppressed, not shown
   headline: {
-    testimonies: 512,
-    events: 12,
-    regions: 4,
-    verifiers: 38,
+    // mode: "ge" → render "≥ value"; "pm" → "value ± pm" (95%); "exact" → small category count
+    testimonies: { value: 512, pm: 34, mode: "pm", proof: "sem-batch:2026Q2:e4d1…0a" },
+    events: { value: 12, mode: "ge", proof: "sem:events:b2…" },
+    regions: { value: 4, mode: "exact", proof: "sem:regions:9c…" },
+    verifiers: { value: 38, pm: 6, mode: "pm", proof: "sem:verif:41…" },
   },
   proofId: "sem-batch:2026Q2:e4d1…0a",
+  // Coarse admin-level breakdown. Counts are noised; `pm` is the 95% half-width.
+  // The final cell falls below minCohort and is therefore suppressed downstream.
   regions: [
-    { name: "Metro region A", count: 247, share: 0.48, proof: "sem:reg-A:1c…", events: 5 },
-    { name: "River delta B", count: 134, share: 0.26, proof: "sem:reg-B:7a…", events: 3 },
-    { name: "Highland C", count: 79, share: 0.15, proof: "sem:reg-C:33…", events: 2 },
-    { name: "Border zone D", count: 52, share: 0.1, proof: "sem:reg-D:9e…", events: 2 },
+    { name: "Metro region A", count: 247, pm: 22, share: 0.47, proof: "sem:reg-A:1c…", events: 5 },
+    { name: "River delta B", count: 134, pm: 18, share: 0.25, proof: "sem:reg-B:7a…", events: 3 },
+    { name: "Highland C", count: 79, pm: 14, share: 0.15, proof: "sem:reg-C:33…", events: 2 },
+    { name: "Border zone D", count: 52, pm: 12, share: 0.1, proof: "sem:reg-D:9e…", events: 2 },
+    { name: "Outer islands E", count: 11, pm: 7, share: 0.02, proof: "sem:reg-E:c4…", events: 1 },
   ],
-  trend: [21, 34, 29, 52, 68, 91, 74, 60, 83],
+  // Month-level series rendered as a fan chart: v is the noised value, pm the 95%
+  // DP half-width drawn as the surrounding uncertainty band.
+  trend: {
+    unit: "Month · 2026",
+    points: [
+      { t: "Jan", v: 21, pm: 9 },
+      { t: "Feb", v: 34, pm: 11 },
+      { t: "Mar", v: 52, pm: 13 },
+      { t: "Apr", v: 74, pm: 16 },
+      { t: "May", v: 91, pm: 18 },
+    ],
+  },
 };
+
+// ---- Theme / topic shares (Public view) ----
+// Counts of themes extracted from text contributors opted into public disclosure.
+// Rendered as a treemap of category *shares* — no verbatim text, no word cloud,
+// no free-text search. (Safe: "treemaps / stacked bars of category shares".)
+export const themes = [
+  { name: "Dispersal / crowd control", share: 0.34, color: "var(--oi-blue)" },
+  { name: "Detention at checkpoints", share: 0.27, color: "var(--oi-green)" },
+  { name: "Property & premises damage", share: 0.18, color: "var(--oi-orange)" },
+  { name: "Denial of medical access", share: 0.12, color: "var(--oi-purple)" },
+  { name: "Other (opted-in)", share: 0.09, color: "var(--faint)" },
+];
+
+// ---- Cited methods (Public view reference block) ----
+// The disclosure-control techniques this dashboard applies, with canonical sources.
+export const methodRefs = [
+  {
+    method: "Differential privacy (Laplace mechanism)",
+    use: "Every published count is perturbed and released with its 95% interval.",
+    cite: "Dwork & Roth, The Algorithmic Foundations of Differential Privacy (2014).",
+  },
+  {
+    method: "Cell suppression",
+    use: "Cohorts below the k-anonymity threshold are withheld entirely, not shown.",
+    cite: "Hundepool et al., Statistical Disclosure Control (Wiley, 2012).",
+  },
+  {
+    method: "Spatial k-anonymity (not geomasking)",
+    use: "Geography is aggregated to coarse admin areas until each holds ≥ k contributors; sub-threshold areas are dropped. No jitter, no point maps.",
+    cite: "Sweeney, k-anonymity (2002); Duckham & Kulik, spatial cloaking (2005).",
+  },
+  {
+    method: "Uncertainty-first visualisation",
+    use: "DP noise is shown as ± bands and fan charts, not hidden behind false-precision points.",
+    cite: "Spiegelhalter et al., visualising uncertainty, Science (2011).",
+  },
+  {
+    method: "Verifiable aggregation",
+    use: "Each figure carries a zero-knowledge count proof a reviewer can recompute without seeing any person.",
+    cite: "Semaphore membership proofs + nullifiers.",
+  },
+];
 
 // Anonymised exemplars contributors opted into public disclosure.
 export const exemplars = [
