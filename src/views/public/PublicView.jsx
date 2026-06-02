@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { aggregate, exemplars, themes, methodRefs } from "../../data/mockData.js";
+import { aggregate, exemplars, themes, methodRefs, issues, regionShapes } from "../../data/mockData.js";
 
 // Fan chart: the noised month-level series with its 95% DP interval drawn as a
 // shaded band. Showing the uncertainty is both more honest and blurs the
@@ -87,8 +87,252 @@ function StatCard({ figure, lbl }) {
   );
 }
 
-// Treemap of theme shares from opted-in text. A 1-D squarified layout (tiles
-// sized by share) — no verbatim text leaves the aggregate.
+// Resolve the per-region view for the current selection. For "all issues" we use
+// the headline regional breakdown; for a specific issue we use its byRegion data.
+// Every cell is tagged none / suppressed / shown against the k-anonymity rule.
+function regionViewFor(issue) {
+  const k = aggregate.minCohort;
+  return aggregate.regions.map((r) => {
+    let count;
+    let pm;
+    let events;
+    if (issue) {
+      const b = issue.byRegion.find((x) => x.region === r.name) || { count: 0 };
+      count = b.count;
+      pm = b.pm;
+    } else {
+      count = r.count;
+      pm = r.pm;
+      events = r.events;
+    }
+    const state = count === 0 ? "none" : count < k ? "suppressed" : "shown";
+    return { name: r.name, count, pm, events, state };
+  });
+}
+
+// Interactive coarse choropleth + constrained issue drill-down.
+// No point/pin layer, no jitter — geography is aggregated to admin regions and
+// sub-threshold cells are suppressed. Rendered as local inline SVG (no tiles/CDN).
+function MapExplorer() {
+  const [issueId, setIssueId] = useState(null); // null = all issues
+  const [region, setRegion] = useState(null);
+
+  const issue = issues.find((i) => i.id === issueId) || null;
+  const view = regionViewFor(issue);
+  const k = aggregate.minCohort;
+  const maxShown = Math.max(1, ...view.filter((v) => v.state === "shown").map((v) => v.count));
+  const total = issue ? issue.total : aggregate.headline.testimonies;
+  const trend = issue ? issue.trend : aggregate.trend;
+  const selected = region ? view.find((v) => v.name === region) : null;
+  const shortName = (name) => name.split(" ").pop();
+
+  return (
+    <div className="stack">
+      {/* Constrained issue selector — fixed list, no free-form filtering */}
+      <div className="issue-tabs" role="tablist" aria-label="Filter by issue">
+        <button
+          role="tab"
+          aria-selected={!issueId}
+          className={!issueId ? "active" : ""}
+          onClick={() => {
+            setIssueId(null);
+            setRegion(null);
+          }}
+        >
+          All issues
+        </button>
+        {issues.map((i) => (
+          <button
+            key={i.id}
+            role="tab"
+            aria-selected={issueId === i.id}
+            className={issueId === i.id ? "active" : ""}
+            onClick={() => {
+              setIssueId(i.id);
+              setRegion(null);
+            }}
+          >
+            <span aria-hidden>{i.icon}</span> {i.name}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid cols-2">
+        {/* ---- Map ---- */}
+        <div className="card pad stack">
+          <div className="eyebrow">
+            Where testimonies come from {issue ? `· ${issue.name}` : "· all issues"}
+          </div>
+          <svg
+            viewBox={regionShapes.viewBox}
+            className="choropleth"
+            role="group"
+            aria-label="Coarse regional choropleth of testimony counts"
+          >
+            <defs>
+              <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <rect width="6" height="6" fill="#f1f3f6" />
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#c2c9d2" strokeWidth="2" />
+              </pattern>
+            </defs>
+            {regionShapes.regions.map((g) => {
+              const v = view.find((x) => x.name === g.name);
+              const intensity = v.state === "shown" ? v.count / maxShown : 0;
+              const fill =
+                v.state === "none"
+                  ? "var(--line-soft)"
+                  : v.state === "suppressed"
+                  ? "url(#hatch)"
+                  : `rgba(0,114,178,${0.2 + intensity * 0.7})`;
+              const isSel = region === g.name;
+              return (
+                <path
+                  key={g.name}
+                  d={g.path}
+                  fill={fill}
+                  stroke={isSel ? "var(--oi-vermillion)" : "#fff"}
+                  strokeWidth={isSel ? 3 : 1.5}
+                  className="region-shape"
+                  onClick={() => setRegion(isSel ? null : g.name)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={
+                    v.state === "shown"
+                      ? `${g.name}: ${v.count} ± ${v.pm}`
+                      : v.state === "suppressed"
+                      ? `${g.name}: fewer than ${k}, suppressed`
+                      : `${g.name}: no testimonies`
+                  }
+                />
+              );
+            })}
+            {regionShapes.regions.map((g) => {
+              const v = view.find((x) => x.name === g.name);
+              const light = v.state === "shown" && v.count / maxShown > 0.5;
+              return (
+                <text
+                  key={`l-${g.name}`}
+                  x={g.lx}
+                  y={g.ly}
+                  fontSize="12"
+                  fontWeight="800"
+                  textAnchor="middle"
+                  pointerEvents="none"
+                  fill={light ? "#fff" : "#16191d"}
+                >
+                  {shortName(g.name)}
+                </text>
+              );
+            })}
+          </svg>
+
+          <div className="map-legend">
+            <span className="swatch grad" /> fewer →
+            <span className="swatch grad-hi" /> more
+            <span className="swatch hatch" /> &lt; {k} suppressed
+            <span className="swatch none" /> none
+          </div>
+
+          {selected ? (
+            <div className="region-detail">
+              <b>{selected.name}</b>
+              {selected.state === "shown" && (
+                <span className="muted">
+                  {" "}
+                  — {selected.count} ± {selected.pm}
+                  {selected.events != null ? ` · ${selected.events} distinct events` : ""}
+                </span>
+              )}
+              {selected.state === "suppressed" && (
+                <span className="faint"> — fewer than {k} contributors · suppressed (no usable count)</span>
+              )}
+              {selected.state === "none" && <span className="faint"> — no testimonies recorded</span>}
+            </div>
+          ) : (
+            <div className="faint" style={{ fontSize: 12 }}>
+              Select a region for its figure. Shading is the DP-noised count; hatched regions fall
+              below the k-anonymity threshold and are suppressed, not estimated.
+            </div>
+          )}
+
+          <div className="faint" style={{ fontSize: 11.5 }}>
+            Coarse admin-level choropleth — no points, no pins, no jitter. Geography is aggregated
+            until each shown cell holds ≥ {k} contributors; the rest are dropped. Rendered locally
+            (no map tiles or third-party CDN).
+          </div>
+        </div>
+
+        {/* ---- Selected-issue statistics ---- */}
+        <div className="card pad stack">
+          <div className="eyebrow">
+            {issue ? "Issue statistics" : "All testimonies"} · verifiable range
+          </div>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+            <div className="n" style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-0.02em" }}>
+              {figureText(total)}
+            </div>
+            <div className="muted" style={{ fontSize: 13 }}>
+              {issue ? issue.name : "verified testimonies"} · {aggregate.window}
+            </div>
+          </div>
+          {issue && (
+            <p className="muted" style={{ fontSize: 13, margin: 0 }}>
+              {issue.blurb}
+            </p>
+          )}
+
+          <div className="eyebrow" style={{ marginTop: 4 }}>By region</div>
+          {view.map((r) =>
+            r.state === "shown" ? (
+              <div key={r.name}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                  <span>{r.name}</span>
+                  <span className="muted">{r.count} ± {r.pm}</span>
+                </div>
+                <div className="bar bar-ci" aria-hidden>
+                  <span
+                    className="ci"
+                    style={{
+                      left: `${((r.count - r.pm) / maxShown) * 100}%`,
+                      width: `${((2 * r.pm) / maxShown) * 100}%`,
+                    }}
+                  />
+                  <span className="pt" style={{ left: `calc(${(r.count / maxShown) * 100}% - 1px)`, background: "var(--oi-blue)" }} />
+                </div>
+              </div>
+            ) : (
+              <div key={r.name}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                  <span>{r.name}</span>
+                  <span className="faint">{r.state === "suppressed" ? `< ${k} · suppressed` : "—"}</span>
+                </div>
+                <div className="bar" aria-hidden>
+                  <span className="suppressed-fill" style={r.state === "none" ? { background: "var(--line-soft)" } : undefined} />
+                </div>
+              </div>
+            )
+          )}
+
+          <div className="eyebrow" style={{ marginTop: 4 }}>Over time · {trend.unit}</div>
+          <FanChart trend={trend} />
+
+          <div className="pill-row">
+            <span className="tag">Semaphore counts</span>
+            <span className="tag">Differential privacy</span>
+            <span className="tag">Constrained drill-down</span>
+          </div>
+          <div className="faint" style={{ fontSize: 11 }}>
+            Issues are a fixed list and every issue×region cell obeys the same suppression rule —
+            there is no free-form filtering that could isolate a single contributor.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Treemap of theme shares from opted-in text. Tiles sized by share — no verbatim
+// text leaves the aggregate.
 function ThemeTreemap({ data }) {
   return (
     <div className="treemap" role="img" aria-label="Share of testimonies by theme">
@@ -109,9 +353,6 @@ function ThemeTreemap({ data }) {
 
 export default function PublicView() {
   const a = aggregate;
-  const visibleRegions = a.regions.filter((r) => r.count >= a.minCohort);
-  const suppressed = a.regions.filter((r) => r.count < a.minCohort);
-  const maxRegion = Math.max(...visibleRegions.map((r) => r.count + (r.pm || 0)));
 
   return (
     <div className="container stack">
@@ -134,66 +375,9 @@ export default function PublicView() {
         <StatCard figure={a.headline.verifiers} lbl="Independent verifiers" />
       </div>
 
-      <div className="grid cols-2">
-        <div className="card pad stack">
-          <div className="eyebrow">By region · coarse admin level</div>
-          {visibleRegions.map((r) => (
-            <div key={r.name}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                <span>{r.name}</span>
-                <span className="muted">
-                  {r.count} ± {r.pm} · {r.events} events
-                </span>
-              </div>
-              <div className="bar bar-ci" aria-hidden>
-                {/* ± interval rendered behind the point estimate */}
-                <span
-                  className="ci"
-                  style={{
-                    left: `${((r.count - r.pm) / maxRegion) * 100}%`,
-                    width: `${((2 * r.pm) / maxRegion) * 100}%`,
-                  }}
-                />
-                <span
-                  className="pt"
-                  style={{ left: `calc(${(r.count / maxRegion) * 100}% - 1px)`, background: "var(--oi-blue)" }}
-                />
-              </div>
-            </div>
-          ))}
-          {suppressed.map((r) => (
-            <div key={r.name}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                <span>{r.name}</span>
-                <span className="faint">&lt; {a.minCohort} · suppressed</span>
-              </div>
-              <div className="bar" aria-hidden>
-                <span className="suppressed-fill" />
-              </div>
-            </div>
-          ))}
-          <div className="faint" style={{ fontSize: 11.5 }}>
-            Counts perturbed with differential privacy (ε = {a.epsilon}) over {a.window};
-            bars show the 95% interval. Any region with fewer than {a.minCohort} contributors is
-            <b> suppressed, not approximated</b> (cohort k-anonymity). No point maps are published.
-          </div>
-        </div>
-
-        <div className="card pad stack">
-          <div className="eyebrow">Verified testimonies over time · {a.trend.unit}</div>
-          <FanChart trend={a.trend} />
-          <p className="muted" style={{ fontSize: 13, margin: 0 }}>
-            The shaded band is the differential-privacy uncertainty, shown rather than hidden.
-            Funders are buying a <b>cryptographically verifiable range</b> — a programme officer
-            can independently recompute every figure without ever seeing a person.
-          </p>
-          <div className="pill-row">
-            <span className="tag">Semaphore counts</span>
-            <span className="tag">Differential privacy</span>
-            <span className="tag">Uncertainty shown</span>
-          </div>
-        </div>
-      </div>
+      {/* ---- Map + per-issue drill-down ---- */}
+      <div className="eyebrow">Explore by issue & geography · fund what you can verify</div>
+      <MapExplorer />
 
       {/* ---- Theme shares ---- */}
       <div className="grid cols-2">

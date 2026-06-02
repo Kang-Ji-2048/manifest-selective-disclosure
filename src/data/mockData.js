@@ -167,6 +167,126 @@ export const aggregate = {
   },
 };
 
+// ---- Coarse region geometry for the choropleth map (Public view) ----
+// A stylised, abstract admin map rendered locally as inline SVG — no map tiles,
+// no third-party CDN, no point/pin layer. Regions are shaded by their noised
+// count; cells below minCohort are suppressed (hatched), never jittered.
+export const regionShapes = {
+  viewBox: "0 0 320 240",
+  regions: [
+    { name: "Metro region A", path: "M24,28 L150,22 L158,112 L34,122 Z", lx: 90, ly: 74 },
+    { name: "River delta B", path: "M150,22 L298,34 L292,118 L158,112 Z", lx: 224, ly: 72 },
+    { name: "Highland C", path: "M34,122 L158,112 L150,214 L40,206 Z", lx: 96, ly: 166 },
+    { name: "Border zone D", path: "M158,112 L292,118 L286,196 L150,214 Z", lx: 220, ly: 162 },
+    { name: "Outer islands E", path: "M296,212 L313,208 L317,224 L300,231 Z", lx: 306, ly: 203 },
+  ],
+};
+
+// ---- Per-issue statistics (Public view, funder drill-down) ----
+// Funders typically back a single issue/project, so the dashboard offers a
+// CONSTRAINED drill-down: a fixed list of issues (no free-form filtering that
+// could isolate a tiny subgroup — the dashboard equivalent of a differencing
+// attack). Every issue×region cell obeys the same minCohort rule; sub-threshold
+// cells carry no usable count. All figures are DP-noised and carry a ZK proof.
+export const issues = [
+  {
+    id: "dispersal",
+    name: "Dispersal / crowd control",
+    icon: "🛡️",
+    blurb: "Forced dispersal of assemblies, crowd-control munitions, beatings.",
+    total: { value: 174, pm: 20, mode: "pm", proof: "sem:iss-disp:7c…" },
+    byRegion: [
+      { region: "Metro region A", count: 92, pm: 14 },
+      { region: "River delta B", count: 46, pm: 11 },
+      { region: "Highland C", count: 24, pm: 8 },
+      { region: "Border zone D", count: 9, pm: 5 },
+      { region: "Outer islands E", count: 0 },
+    ],
+    trend: {
+      unit: "Month · 2026",
+      points: [
+        { t: "Jan", v: 8, pm: 5 },
+        { t: "Feb", v: 14, pm: 6 },
+        { t: "Mar", v: 31, pm: 9 },
+        { t: "Apr", v: 52, pm: 12 },
+        { t: "May", v: 69, pm: 14 },
+      ],
+    },
+  },
+  {
+    id: "detention",
+    name: "Detention at checkpoints",
+    icon: "⛓️",
+    blurb: "Arbitrary detention and disappearances at checkpoints and corridors.",
+    total: { value: 138, pm: 18, mode: "pm", proof: "sem:iss-det:2a…" },
+    byRegion: [
+      { region: "Metro region A", count: 71, pm: 13 },
+      { region: "River delta B", count: 38, pm: 10 },
+      { region: "Highland C", count: 18, pm: 7 },
+      { region: "Border zone D", count: 11, pm: 6 },
+      { region: "Outer islands E", count: 0 },
+    ],
+    trend: {
+      unit: "Month · 2026",
+      points: [
+        { t: "Jan", v: 6, pm: 4 },
+        { t: "Feb", v: 12, pm: 6 },
+        { t: "Mar", v: 24, pm: 8 },
+        { t: "Apr", v: 41, pm: 10 },
+        { t: "May", v: 55, pm: 12 },
+      ],
+    },
+  },
+  {
+    id: "property",
+    name: "Property & premises damage",
+    icon: "🏚️",
+    blurb: "Destruction of homes, premises and livelihoods.",
+    total: { value: 92, pm: 15, mode: "pm", proof: "sem:iss-prop:9e…" },
+    byRegion: [
+      { region: "Metro region A", count: 48, pm: 11 },
+      { region: "River delta B", count: 25, pm: 8 },
+      { region: "Highland C", count: 14, pm: 6 },
+      { region: "Border zone D", count: 5, pm: 4 },
+      { region: "Outer islands E", count: 0 },
+    ],
+    trend: {
+      unit: "Month · 2026",
+      points: [
+        { t: "Jan", v: 5, pm: 4 },
+        { t: "Feb", v: 9, pm: 5 },
+        { t: "Mar", v: 17, pm: 7 },
+        { t: "Apr", v: 26, pm: 8 },
+        { t: "May", v: 35, pm: 9 },
+      ],
+    },
+  },
+  {
+    id: "medical",
+    name: "Denial of medical access",
+    icon: "🚑",
+    blurb: "Obstruction of medical care and denial of access to the injured.",
+    total: { value: 61, pm: 12, mode: "pm", proof: "sem:iss-med:41…" },
+    byRegion: [
+      { region: "Metro region A", count: 33, pm: 9 },
+      { region: "River delta B", count: 21, pm: 7 },
+      { region: "Highland C", count: 7, pm: 4 },
+      { region: "Border zone D", count: 0 },
+      { region: "Outer islands E", count: 0 },
+    ],
+    trend: {
+      unit: "Month · 2026",
+      points: [
+        { t: "Jan", v: 3, pm: 3 },
+        { t: "Feb", v: 7, pm: 4 },
+        { t: "Mar", v: 11, pm: 5 },
+        { t: "Apr", v: 17, pm: 6 },
+        { t: "May", v: 23, pm: 7 },
+      ],
+    },
+  },
+];
+
 // ---- Theme / topic shares (Public view) ----
 // Counts of themes extracted from text contributors opted into public disclosure.
 // Rendered as a treemap of category *shares* — no verbatim text, no word cloud,

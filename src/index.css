@@ -1029,6 +1029,81 @@ button {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
+/* Constrained issue selector. */
+.issue-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.issue-tabs button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 7px 13px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.issue-tabs button:hover {
+  border-color: var(--oi-blue);
+  color: var(--ink);
+}
+.issue-tabs button.active {
+  background: var(--oi-blue);
+  border-color: var(--oi-blue);
+  color: #fff;
+}
+
+/* Coarse regional choropleth. */
+.choropleth {
+  width: 100%;
+  height: auto;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.region-shape {
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+.region-shape:hover {
+  opacity: 0.82;
+}
+.map-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--muted);
+}
+.map-legend .swatch {
+  display: inline-block;
+  width: 16px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+}
+.map-legend .swatch.grad {
+  background: rgba(0, 114, 178, 0.22);
+}
+.map-legend .swatch.grad-hi {
+  background: rgba(0, 114, 178, 0.9);
+}
+.map-legend .swatch.hatch {
+  background: repeating-linear-gradient(45deg, #f1f3f6, #f1f3f6 3px, #c2c9d2 3px, #c2c9d2 5px);
+}
+.map-legend .swatch.none {
+  background: var(--line-soft);
+}
+.region-detail {
+  font-size: 13.5px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+}
+
 /* Cited-methods reference block. */
 .method-list {
   list-style: none;
