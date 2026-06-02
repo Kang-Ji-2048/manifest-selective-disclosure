@@ -302,65 +302,60 @@ export default function IndividualView() {
 
   return (
     <div className="container">
-      <div style={{ maxWidth: 720, margin: "0 auto 18px" }}>
+      <div className="indiv-wrap stack">
         <PrivacyBar />
-      </div>
-      <div className="phone-stage">
-        <div className="phone">
-          <div className="screen">
-            <div className="statusbar">
-              <span>09:41</span>
-              <span>◧ offline · ▣ 38%</span>
+
+        <div className="card">
+          <div className="indiv-head">
+            <div style={{ flex: 1 }}>
+              <h1>{active.title}</h1>
+              <div className="sub">{active.sub}</div>
             </div>
-            <div className="topbar" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ flex: 1 }}>
-                <div className="ttl">{active.title}</div>
-                <div className="sub">{active.sub}</div>
-              </div>
+            <button
+              className="btn btn-ghost"
+              onClick={wipe}
+              title="End the session and wipe everything from memory"
+            >
+              <span aria-hidden>⏻</span> End session
+            </button>
+          </div>
+
+          <div className="tabs" role="tablist" aria-label="Vault sections">
+            {TABS.map((t) => (
               <button
-                className="btn btn-ghost"
-                title="Wipe session now"
-                onClick={wipe}
-                style={{ padding: "6px 8px", fontSize: 18 }}
-                aria-label="Wipe session"
+                key={t.id}
+                role="tab"
+                aria-selected={t.id === tab}
+                className={t.id === tab ? "active" : ""}
+                onClick={() => setTab(t.id)}
               >
-                ⏻
+                <span className="ic" aria-hidden>
+                  {t.ic}
+                </span>
+                {t.label}
               </button>
-            </div>
-            <div className="scroll">
-              {tab === "vault" && <VaultPane />}
-              {tab === "leaves" && <LeavesPane />}
-              {tab === "proof" && <ProofPane />}
-              {tab === "audit" && <AuditPane />}
-            </div>
-            <div className="tabbar">
-              {TABS.map((t) => (
-                <button
-                  key={t.id}
-                  className={t.id === tab ? "active" : ""}
-                  onClick={() => setTab(t.id)}
-                >
-                  <span className="ic" aria-hidden>
-                    {t.ic}
-                  </span>
-                  {t.label}
-                </button>
-              ))}
-            </div>
+            ))}
+          </div>
+
+          <div className="indiv-content">
+            {tab === "vault" && <VaultPane />}
+            {tab === "leaves" && <LeavesPane />}
+            {tab === "proof" && <ProofPane />}
+            {tab === "audit" && <AuditPane />}
           </div>
         </div>
 
-        {/* Desktop legend */}
-        <div style={{ maxWidth: 320, flex: "1 1 260px" }} className="stack">
-          <div className="eyebrow">The 60-second trust model</div>
-          <Legend n="1" t="Vault" d="Your testimony is encrypted; only you hold the key. Your data stays with you." />
-          <Legend n="2" t="What leaves" d="One screen, four levels, plain-language consequences. Safe default is ‘No disclosure’." />
-          <Legend n="3" t="Proof" d="A verified badge proving authenticity without identity — what a funder or court receives." />
-          <Legend n="4" t="Audit" d="Every disclosure is logged back to you. Power made legible." />
-          <div className="hint-chip">
-            Try it: open <b>What leaves</b>, set a testimony to a different level, then check
-            the <b>Audit</b> tab. Leave it idle and the vault locks itself.
-          </div>
+        <div className="hint-chip">
+          Try it: open <b>What leaves</b>, set a testimony to a different level, then check the{" "}
+          <b>Audit</b> tab. Leave the page idle and it locks itself.
+        </div>
+
+        <div className="eyebrow">The 60-second trust model</div>
+        <div className="mini-legend">
+          <Legend n="1" t="Vault" d="Your testimony is encrypted; only you hold the key." />
+          <Legend n="2" t="What leaves" d="Four levels, plain-language consequences. Default is ‘No disclosure’." />
+          <Legend n="3" t="Proof" d="A verified badge proving authenticity without identity." />
+          <Legend n="4" t="Audit" d="Every disclosure is logged back to you." />
         </div>
       </div>
     </div>
@@ -369,7 +364,7 @@ export default function IndividualView() {
 
 function Legend({ n, t, d }) {
   return (
-    <div style={{ display: "flex", gap: 10 }}>
+    <div className="card pad" style={{ display: "flex", gap: 10 }}>
       <div
         style={{
           flex: "0 0 24px",
@@ -386,7 +381,7 @@ function Legend({ n, t, d }) {
       >
         {n}
       </div>
-      <div style={{ fontSize: 13 }}>
+      <div style={{ fontSize: 12.5 }}>
         <b>{t}.</b> <span className="muted">{d}</span>
       </div>
     </div>
