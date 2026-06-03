@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { aggregate, exemplars, themes, methodRefs, issues, regionShapes, COUNTRY_TO_REGION } from "../../data/mockData.js";
+import { aggregate, themes, methodRefs, issues, regionShapes, COUNTRY_TO_REGION } from "../../data/mockData.js";
 import { apacGeo } from "../../data/apacGeo.js";
 
 // Project the bundled APAC country geometry into SVG space once, with a simple
@@ -482,17 +482,6 @@ export default function PublicView() {
             none of this hardens the contributor's endpoint, which remains the weakest link.
           </div>
         </div>
-      </div>
-
-      {/* ---- Public exemplars ---- */}
-      <div className="eyebrow">In their words · shared by choice, stripped of identity</div>
-      <div className="grid cols-3">
-        {exemplars.map((x) => (
-          <div className="exemplar" key={x.id}>
-            <div className="q">“{x.quote}”</div>
-            <div className="src">{x.src}</div>
-          </div>
-        ))}
       </div>
 
       {/* ---- Nudge ---- */}

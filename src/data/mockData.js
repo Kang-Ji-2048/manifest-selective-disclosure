@@ -365,28 +365,6 @@ export const methodRefs = [
   },
 ];
 
-// Anonymised exemplars contributors opted into public disclosure.
-export const exemplars = [
-  {
-    id: "x1",
-    quote:
-      "Three vans arrived before dawn. I filmed from the second floor until the battery died. I never thought a count could protect me — but no one knows it was me.",
-    src: "Verified testimony · coastal-A · May 2026 · no identity attached",
-  },
-  {
-    id: "x2",
-    quote:
-      "I was sure I was the only one who saw it. The matching told me forty-one others recorded the same hour. That changed what I was willing to do.",
-    src: "Verified testimony · northern-A · May 2026 · no identity attached",
-  },
-  {
-    id: "x3",
-    quote:
-      "The phone was borrowed. There was no account, no login that survived. When I closed the app it was as if I had never opened it.",
-    src: "Verified testimony · central-A · April 2026 · no identity attached",
-  },
-];
-
 // ---- Court view ----
 export const authorisedOrgs = [
   {
