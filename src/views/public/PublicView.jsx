@@ -272,10 +272,8 @@ function MapExplorer() {
               );
             })}
             {regionShapes.regions.map((g) => {
-              const v = view.find((x) => x.name === g.name);
               const pos = APAC.labels[g.name];
               if (!pos) return null;
-              const light = v.state === "shown" && v.count / maxShown > 0.5;
               return (
                 <text
                   key={`l-${g.name}`}
@@ -286,10 +284,10 @@ function MapExplorer() {
                   textAnchor="middle"
                   pointerEvents="none"
                   style={{
-                    fill: light ? "var(--on-accent)" : "var(--ink)",
+                    fill: "var(--ink)",
                     paintOrder: "stroke",
-                    stroke: "rgba(0,0,0,0.5)",
-                    strokeWidth: 2.4,
+                    stroke: "var(--bg)",
+                    strokeWidth: 3,
                   }}
                 >
                   {g.short}
