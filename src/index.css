@@ -294,14 +294,13 @@ button {
 .cols-4 {
   grid-template-columns: repeat(4, 1fr);
 }
-/* Tablet: keep four-up cards two-up, single-column the wider pairs/triples. */
+/* Mobile/tablet: every grid becomes a single full-width column, so all
+   blocks line up at the same width. */
 @media (max-width: 860px) {
   .cols-2,
-  .cols-3 {
-    grid-template-columns: 1fr;
-  }
+  .cols-3,
   .cols-4 {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
   .viewnav a {
     padding: 6px 10px;
@@ -334,11 +333,8 @@ button {
   }
 }
 
-/* Phone: tighten spacing and headline sizes, collapse four-up to one. */
+/* Phone: tighten spacing and headline sizes. */
 @media (max-width: 520px) {
-  .cols-4 {
-    grid-template-columns: 1fr;
-  }
   .container {
     padding: 18px 14px 48px;
   }
