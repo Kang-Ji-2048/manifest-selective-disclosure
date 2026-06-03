@@ -1184,6 +1184,37 @@ button {
   background: var(--line-soft);
 }
 
+/* ---------- How-it-works page ---------- */
+.how-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.how-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.step-num {
+  flex: 0 0 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.how-level {
+  gap: 8px;
+}
+
 /* Cited-methods reference block. */
 .method-list {
   list-style: none;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, NavLink, useLocation, Navigate } from "react-router-dom";
 import PublicView from "./views/public/PublicView.jsx";
+import HowView from "./views/how/HowView.jsx";
 import IndividualView from "./views/individual/IndividualView.jsx";
 import CourtView from "./views/court/CourtView.jsx";
 
@@ -60,6 +61,9 @@ function Header() {
           <NavLink to="/public" className={({ isActive }) => (isActive ? "active" : "")}>
             Public
           </NavLink>
+          <NavLink to="/how" className={({ isActive }) => (isActive ? "active" : "")}>
+            How it works
+          </NavLink>
           <NavLink to="/me" className={({ isActive }) => (isActive ? "active" : "")}>
             Individual
           </NavLink>
@@ -97,6 +101,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/public" replace />} />
           <Route path="/public" element={<PublicView />} />
+          <Route path="/how" element={<HowView />} />
           <Route path="/me" element={<IndividualView />} />
           <Route path="/court" element={<CourtView />} />
           <Route path="*" element={<Navigate to="/public" replace />} />
