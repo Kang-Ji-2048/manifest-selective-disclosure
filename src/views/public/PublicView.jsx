@@ -127,7 +127,6 @@ function MapExplorer() {
   const total = issue ? issue.total : aggregate.headline.testimonies;
   const trend = issue ? issue.trend : aggregate.trend;
   const selected = region ? view.find((v) => v.name === region) : null;
-  const shortName = (name) => name.split(" ").pop();
 
   return (
     <div className="stack">
@@ -164,7 +163,7 @@ function MapExplorer() {
         {/* ---- Map ---- */}
         <div className="card pad stack">
           <div className="eyebrow">
-            Where testimonies come from {issue ? `· ${issue.name}` : "· all issues"}
+            Where testimonies come from · Asia–Pacific {issue ? `· ${issue.name}` : ""}
           </div>
           <svg
             viewBox={regionShapes.viewBox}
@@ -221,7 +220,7 @@ function MapExplorer() {
                   pointerEvents="none"
                   style={{ fill: light ? "var(--on-accent)" : "var(--ink)" }}
                 >
-                  {shortName(g.name)}
+                  {g.short}
                 </text>
               );
             })}

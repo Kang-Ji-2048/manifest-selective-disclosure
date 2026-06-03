@@ -14,7 +14,7 @@ export const myTestimonies = [
     kind: "video",
     icon: "🎥",
     captured: "2026-05-28",
-    locationClass: "Coastal district · Metro region A",
+    locationClass: "Coastal district · South Asia",
     detail: "0:48 · 1080p · captured offline",
     accessLevel: "partial",
     proof: {
@@ -43,7 +43,7 @@ export const myTestimonies = [
     kind: "video",
     icon: "🎥",
     captured: "2026-05-28",
-    locationClass: "Northern corridor · Metro region A",
+    locationClass: "Northern corridor · South Asia",
     detail: "1:12 · audio + video · captured offline",
     accessLevel: "public",
     proof: {
@@ -72,7 +72,7 @@ export const myTestimonies = [
     kind: "photos",
     icon: "📷",
     captured: "2026-05-29",
-    locationClass: "Central market · Metro region A",
+    locationClass: "Central market · South Asia",
     detail: "3 photos · C2PA-signed at capture",
     accessLevel: "none",
     proof: {
@@ -147,11 +147,11 @@ export const aggregate = {
   // Coarse admin-level breakdown. Counts are noised; `pm` is the 95% half-width.
   // The final cell falls below minCohort and is therefore suppressed downstream.
   regions: [
-    { name: "Metro region A", count: 247, pm: 22, share: 0.47, proof: "sem:reg-A:1c…", events: 5 },
-    { name: "River delta B", count: 134, pm: 18, share: 0.25, proof: "sem:reg-B:7a…", events: 3 },
-    { name: "Highland C", count: 79, pm: 14, share: 0.15, proof: "sem:reg-C:33…", events: 2 },
-    { name: "Border zone D", count: 52, pm: 12, share: 0.1, proof: "sem:reg-D:9e…", events: 2 },
-    { name: "Outer islands E", count: 11, pm: 7, share: 0.02, proof: "sem:reg-E:c4…", events: 1 },
+    { name: "South Asia", count: 247, pm: 22, share: 0.47, proof: "sem:reg-A:1c…", events: 5 },
+    { name: "Southeast Asia", count: 134, pm: 18, share: 0.25, proof: "sem:reg-B:7a…", events: 3 },
+    { name: "East Asia", count: 79, pm: 14, share: 0.15, proof: "sem:reg-C:33…", events: 2 },
+    { name: "Oceania", count: 52, pm: 12, share: 0.1, proof: "sem:reg-D:9e…", events: 2 },
+    { name: "Pacific Islands", count: 11, pm: 7, share: 0.02, proof: "sem:reg-E:c4…", events: 1 },
   ],
   // Month-level series rendered as a fan chart: v is the noised value, pm the 95%
   // DP half-width drawn as the surrounding uncertainty band.
@@ -171,14 +171,18 @@ export const aggregate = {
 // A stylised, abstract admin map rendered locally as inline SVG — no map tiles,
 // no third-party CDN, no point/pin layer. Regions are shaded by their noised
 // count; cells below minCohort are suppressed (hatched), never jittered.
+// A stylised map of the Asia–Pacific (APAC) region, drawn as five coarse
+// sub-regions positioned roughly geographically (east = right, south = down).
+// Shapes are deliberately abstract — coarse sub-regional aggregation gives
+// larger k-anonymity cohorts than any country- or point-level map would.
 export const regionShapes = {
   viewBox: "0 0 320 240",
   regions: [
-    { name: "Metro region A", path: "M24,28 L150,22 L158,112 L34,122 Z", lx: 90, ly: 74 },
-    { name: "River delta B", path: "M150,22 L298,34 L292,118 L158,112 Z", lx: 224, ly: 72 },
-    { name: "Highland C", path: "M34,122 L158,112 L150,214 L40,206 Z", lx: 96, ly: 166 },
-    { name: "Border zone D", path: "M158,112 L292,118 L286,196 L150,214 Z", lx: 220, ly: 162 },
-    { name: "Outer islands E", path: "M296,212 L313,208 L317,224 L300,231 Z", lx: 306, ly: 203 },
+    { name: "South Asia", short: "S Asia", path: "M36,82 L118,74 L130,118 L84,160 L50,124 Z", lx: 80, ly: 112 },
+    { name: "East Asia", short: "E Asia", path: "M150,38 L214,26 L260,54 L252,98 L198,108 L158,84 Z", lx: 205, ly: 70 },
+    { name: "Southeast Asia", short: "SE Asia", path: "M140,116 L198,114 L230,142 L212,178 L150,172 L130,142 Z", lx: 178, ly: 148 },
+    { name: "Oceania", short: "Oceania", path: "M206,184 L288,180 L300,214 L244,232 L208,216 Z", lx: 250, ly: 208 },
+    { name: "Pacific Islands", short: "Pacific", path: "M288,102 L302,98 L308,112 L294,118 Z M298,130 L312,126 L317,140 L303,146 Z", lx: 302, ly: 166 },
   ],
 };
 
@@ -196,11 +200,11 @@ export const issues = [
     blurb: "Forced dispersal of assemblies, crowd-control munitions, beatings.",
     total: { value: 174, pm: 20, mode: "pm", proof: "sem:iss-disp:7c…" },
     byRegion: [
-      { region: "Metro region A", count: 92, pm: 14 },
-      { region: "River delta B", count: 46, pm: 11 },
-      { region: "Highland C", count: 24, pm: 8 },
-      { region: "Border zone D", count: 9, pm: 5 },
-      { region: "Outer islands E", count: 0 },
+      { region: "South Asia", count: 92, pm: 14 },
+      { region: "Southeast Asia", count: 46, pm: 11 },
+      { region: "East Asia", count: 24, pm: 8 },
+      { region: "Oceania", count: 9, pm: 5 },
+      { region: "Pacific Islands", count: 0 },
     ],
     trend: {
       unit: "Month · 2026",
@@ -220,11 +224,11 @@ export const issues = [
     blurb: "Arbitrary detention and disappearances at checkpoints and corridors.",
     total: { value: 138, pm: 18, mode: "pm", proof: "sem:iss-det:2a…" },
     byRegion: [
-      { region: "Metro region A", count: 71, pm: 13 },
-      { region: "River delta B", count: 38, pm: 10 },
-      { region: "Highland C", count: 18, pm: 7 },
-      { region: "Border zone D", count: 11, pm: 6 },
-      { region: "Outer islands E", count: 0 },
+      { region: "South Asia", count: 71, pm: 13 },
+      { region: "Southeast Asia", count: 38, pm: 10 },
+      { region: "East Asia", count: 18, pm: 7 },
+      { region: "Oceania", count: 11, pm: 6 },
+      { region: "Pacific Islands", count: 0 },
     ],
     trend: {
       unit: "Month · 2026",
@@ -244,11 +248,11 @@ export const issues = [
     blurb: "Destruction of homes, premises and livelihoods.",
     total: { value: 92, pm: 15, mode: "pm", proof: "sem:iss-prop:9e…" },
     byRegion: [
-      { region: "Metro region A", count: 48, pm: 11 },
-      { region: "River delta B", count: 25, pm: 8 },
-      { region: "Highland C", count: 14, pm: 6 },
-      { region: "Border zone D", count: 5, pm: 4 },
-      { region: "Outer islands E", count: 0 },
+      { region: "South Asia", count: 48, pm: 11 },
+      { region: "Southeast Asia", count: 25, pm: 8 },
+      { region: "East Asia", count: 14, pm: 6 },
+      { region: "Oceania", count: 5, pm: 4 },
+      { region: "Pacific Islands", count: 0 },
     ],
     trend: {
       unit: "Month · 2026",
@@ -268,11 +272,11 @@ export const issues = [
     blurb: "Obstruction of medical care and denial of access to the injured.",
     total: { value: 61, pm: 12, mode: "pm", proof: "sem:iss-med:41…" },
     byRegion: [
-      { region: "Metro region A", count: 33, pm: 9 },
-      { region: "River delta B", count: 21, pm: 7 },
-      { region: "Highland C", count: 7, pm: 4 },
-      { region: "Border zone D", count: 0 },
-      { region: "Outer islands E", count: 0 },
+      { region: "South Asia", count: 33, pm: 9 },
+      { region: "Southeast Asia", count: 21, pm: 7 },
+      { region: "East Asia", count: 7, pm: 4 },
+      { region: "Oceania", count: 0 },
+      { region: "Pacific Islands", count: 0 },
     ],
     trend: {
       unit: "Month · 2026",
@@ -383,7 +387,7 @@ export const courtEvidence = [
     title: "Dispersal at the port road",
     disclosurePath: "A", // A = aggregate proof + anchor; B = witness steps forward; C = sealed escrow
     pathLabel: "Path A · aggregate proof + timing anchor",
-    locationClass: "Coastal district · Metro region A",
+    locationClass: "Coastal district · South Asia",
     capturedWindow: "28 May 2026 · morning",
     identity: "Not disclosed",
     zk: {
@@ -417,7 +421,7 @@ export const courtEvidence = [
     title: "Checkpoint detention",
     disclosurePath: "B",
     pathLabel: "Path B · witness stepped forward (BBS+ selective disclosure)",
-    locationClass: "Northern corridor · Metro region A",
+    locationClass: "Northern corridor · South Asia",
     capturedWindow: "28 May 2026 · afternoon",
     identity: "Disclosed to this court only, with consent (ref. WIT-0007)",
     zk: {
