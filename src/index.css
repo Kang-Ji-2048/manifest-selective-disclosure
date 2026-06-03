@@ -1039,13 +1039,24 @@ button {
   height: 12px;
   overflow: visible;
 }
-.bar-ci .ci {
+/* Zero-anchored magnitude fill so each row reads as a bar. */
+.bar-ci .fill {
   position: absolute;
+  left: 0;
   top: 3px;
   height: 6px;
   border-radius: 999px;
-  background: rgba(var(--accent-rgb), 0.22);
+  background: rgba(var(--accent-rgb), 0.28);
 }
+/* The 95% interval band, drawn brighter over the fill. */
+.bar-ci .ci {
+  position: absolute;
+  top: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(var(--accent-rgb), 0.6);
+}
+/* The point estimate. */
 .bar-ci .pt {
   position: absolute;
   top: 0;

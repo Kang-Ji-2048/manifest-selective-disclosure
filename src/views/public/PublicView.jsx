@@ -180,7 +180,10 @@ function MapExplorer() {
   const issue = issues.find((i) => i.id === issueId) || null;
   const view = regionViewFor(issue);
   const k = aggregate.minCohort;
-  const maxShown = Math.max(1, ...view.filter((v) => v.state === "shown").map((v) => v.count));
+  const shownVals = view.filter((v) => v.state === "shown");
+  const maxShown = Math.max(1, ...shownVals.map((v) => v.count));
+  // Axis for the bars must include the upper interval so nothing overflows the track.
+  const axisMax = Math.max(1, ...shownVals.map((v) => v.count + v.pm));
   const total = issue ? issue.total : aggregate.headline.testimonies;
   const trend = issue ? issue.trend : aggregate.trend;
   const selected = region ? view.find((v) => v.name === region) : null;
@@ -360,14 +363,15 @@ function MapExplorer() {
                   <span className="muted">{r.count} ± {r.pm}</span>
                 </div>
                 <div className="bar bar-ci" aria-hidden>
+                  <span className="fill" style={{ width: `${(r.count / axisMax) * 100}%` }} />
                   <span
                     className="ci"
                     style={{
-                      left: `${((r.count - r.pm) / maxShown) * 100}%`,
-                      width: `${((2 * r.pm) / maxShown) * 100}%`,
+                      left: `${((r.count - r.pm) / axisMax) * 100}%`,
+                      width: `${((2 * r.pm) / axisMax) * 100}%`,
                     }}
                   />
-                  <span className="pt" style={{ left: `calc(${(r.count / maxShown) * 100}% - 1px)`, background: "var(--accent)" }} />
+                  <span className="pt" style={{ left: `calc(${(r.count / axisMax) * 100}% - 1px)`, background: "var(--accent)" }} />
                 </div>
               </div>
             ) : (
