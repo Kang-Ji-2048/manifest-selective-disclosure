@@ -294,14 +294,72 @@ button {
 .cols-4 {
   grid-template-columns: repeat(4, 1fr);
 }
+/* Tablet: keep four-up cards two-up, single-column the wider pairs/triples. */
 @media (max-width: 860px) {
   .cols-2,
-  .cols-3,
-  .cols-4 {
+  .cols-3 {
     grid-template-columns: 1fr;
+  }
+  .cols-4 {
+    grid-template-columns: 1fr 1fr;
   }
   .viewnav a {
     padding: 6px 10px;
+  }
+}
+
+/* Header reflow: wrap, drop the tagline, move the nav to its own row. */
+@media (max-width: 720px) {
+  .app-header .inner {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    padding: 9px 14px;
+  }
+  .brand .pillars {
+    display: none;
+  }
+  .theme-toggle {
+    margin-left: auto;
+  }
+  .viewnav {
+    order: 3;
+    flex-basis: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .viewnav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Phone: tighten spacing and headline sizes, collapse four-up to one. */
+@media (max-width: 520px) {
+  .cols-4 {
+    grid-template-columns: 1fr;
+  }
+  .container {
+    padding: 18px 14px 48px;
+  }
+  .hero {
+    padding: 22px 18px;
+  }
+  .hero h1 {
+    font-size: 22px;
+  }
+  .hero p {
+    font-size: 14px;
+  }
+  .stat .n {
+    font-size: 24px;
+  }
+  .flow-step {
+    gap: 12px;
+  }
+  .flow-ic {
+    width: 52px;
+    height: 52px;
   }
 }
 

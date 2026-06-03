@@ -4,16 +4,19 @@ import PublicView from "./views/public/PublicView.jsx";
 import HowView from "./views/how/HowView.jsx";
 import IndividualView from "./views/individual/IndividualView.jsx";
 import CourtView from "./views/court/CourtView.jsx";
+import { useMediaQuery } from "./hooks/useMediaQuery.js";
 
 // Colour themes. Default is high-contrast Black & Yellow; Okabe–Ito is offered
 // as a colour-blind-safe accessibility option. The choice is applied to the
 // <html> element and persisted in localStorage.
 const THEMES = [
-  { id: "black-yellow", label: "Black & Yellow", title: "High-contrast default palette" },
-  { id: "okabe-ito", label: "Okabe–Ito", title: "Colour-blind-safe accessibility palette" },
+  { id: "black-yellow", label: "Black & Yellow", short: "B&Y", title: "High-contrast default palette" },
+  { id: "okabe-ito", label: "Okabe–Ito", short: "OI", title: "Colour-blind-safe accessibility palette" },
 ];
 
 function ThemeToggle() {
+  // Example of JS-driven divergence: shorter labels on small screens.
+  const compact = useMediaQuery("(max-width: 600px)");
   const [theme, setTheme] = useState(() => {
     if (typeof localStorage !== "undefined") {
       return localStorage.getItem("manifest-theme") || "black-yellow";
@@ -38,9 +41,10 @@ function ThemeToggle() {
           className={theme === t.id ? "active" : ""}
           aria-pressed={theme === t.id}
           title={t.title}
+          aria-label={t.title}
           onClick={() => setTheme(t.id)}
         >
-          {t.label}
+          {compact ? t.short : t.label}
         </button>
       ))}
     </div>
