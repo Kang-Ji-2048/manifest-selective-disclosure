@@ -1,7 +1,50 @@
+import { useState, useEffect } from "react";
 import { Routes, Route, NavLink, useLocation, Navigate } from "react-router-dom";
 import PublicView from "./views/public/PublicView.jsx";
 import IndividualView from "./views/individual/IndividualView.jsx";
 import CourtView from "./views/court/CourtView.jsx";
+
+// Colour themes. Default is high-contrast Black & Yellow; Okabe–Ito is offered
+// as a colour-blind-safe accessibility option. The choice is applied to the
+// <html> element and persisted in localStorage.
+const THEMES = [
+  { id: "black-yellow", label: "Black & Yellow", title: "High-contrast default palette" },
+  { id: "okabe-ito", label: "Okabe–Ito", title: "Colour-blind-safe accessibility palette" },
+];
+
+function ThemeToggle() {
+  const [theme, setTheme] = useState(() => {
+    if (typeof localStorage !== "undefined") {
+      return localStorage.getItem("manifest-theme") || "black-yellow";
+    }
+    return "black-yellow";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem("manifest-theme", theme);
+    } catch {
+      /* storage unavailable — theme still applies for this session */
+    }
+  }, [theme]);
+
+  return (
+    <div className="theme-toggle" role="group" aria-label="Colour theme">
+      {THEMES.map((t) => (
+        <button
+          key={t.id}
+          className={theme === t.id ? "active" : ""}
+          aria-pressed={theme === t.id}
+          title={t.title}
+          onClick={() => setTheme(t.id)}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 function Header() {
   const { pathname } = useLocation();
@@ -24,6 +67,7 @@ function Header() {
             Court
           </NavLink>
         </nav>
+        <ThemeToggle />
       </div>
     </header>
   );

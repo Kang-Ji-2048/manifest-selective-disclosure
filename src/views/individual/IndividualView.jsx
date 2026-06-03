@@ -28,7 +28,7 @@ function Login() {
         <div style={{ fontSize: 44 }} aria-hidden>
           🔑
         </div>
-        <h1 style={{ fontSize: 22, color: "var(--oi-blue)" }}>Only you hold the key</h1>
+        <h1 style={{ fontSize: 22, color: "var(--accent-text)" }}>Only you hold the key</h1>
         <p className="muted" style={{ margin: 0 }}>
           There is no account and no username. Your passphrase unlocks the vault on
           this device only — it is never sent anywhere.
@@ -370,8 +370,8 @@ function Legend({ n, t, d }) {
           flex: "0 0 24px",
           height: 24,
           borderRadius: "50%",
-          background: "var(--oi-blue)",
-          color: "#fff",
+          background: "var(--accent)",
+          color: "var(--on-accent)",
           fontWeight: 700,
           fontSize: 12,
           display: "flex",

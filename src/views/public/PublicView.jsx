@@ -5,7 +5,7 @@ import { aggregate, exemplars, themes, methodRefs, issues, regionShapes } from "
 // Fan chart: the noised month-level series with its 95% DP interval drawn as a
 // shaded band. Showing the uncertainty is both more honest and blurs the
 // precision an attacker would need.
-function FanChart({ trend, color = "#0072b2" }) {
+function FanChart({ trend, color = "var(--accent)" }) {
   const w = 280;
   const h = 96;
   const padX = 8;
@@ -24,18 +24,21 @@ function FanChart({ trend, color = "#0072b2" }) {
     " " +
     pts.map((_, i) => `${x(pts.length - 1 - i)},${y(lo[pts.length - 1 - i])}`).join(" ");
 
+  // `color` flows in via the SVG's CSS `color` so currentColor resolves the
+  // theme variable (var() does not resolve in SVG presentation attributes).
   return (
     <svg
       width="100%"
       viewBox={`0 0 ${w} ${h}`}
       role="img"
       aria-label="Verified testimonies per month, with 95% differential-privacy interval"
+      style={{ color }}
     >
-      <polygon points={band} fill={color} opacity="0.16" />
-      <polyline points={center} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <polygon points={band} fill="currentColor" opacity="0.16" />
+      <polyline points={center} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
       {pts.map((p, i) => (
         <g key={p.t}>
-          <circle cx={x(i)} cy={y(p.v)} r="2.6" fill={color} />
+          <circle cx={x(i)} cy={y(p.v)} r="2.6" fill="currentColor" />
           <text x={x(i)} y={h - 6} fontSize="9" textAnchor="middle" fill="#8a929c">
             {p.t}
           </text>
@@ -183,15 +186,13 @@ function MapExplorer() {
                   ? "var(--line-soft)"
                   : v.state === "suppressed"
                   ? "url(#hatch)"
-                  : `rgba(0,114,178,${0.2 + intensity * 0.7})`;
+                  : `rgba(var(--accent-rgb),${0.2 + intensity * 0.7})`;
               const isSel = region === g.name;
               return (
                 <path
                   key={g.name}
                   d={g.path}
-                  fill={fill}
-                  stroke={isSel ? "var(--oi-vermillion)" : "#fff"}
-                  strokeWidth={isSel ? 3 : 1.5}
+                  style={{ fill, stroke: isSel ? "var(--oi-vermillion)" : "#fff", strokeWidth: isSel ? 3 : 1.5 }}
                   className="region-shape"
                   onClick={() => setRegion(isSel ? null : g.name)}
                   role="button"
@@ -218,7 +219,7 @@ function MapExplorer() {
                   fontWeight="800"
                   textAnchor="middle"
                   pointerEvents="none"
-                  fill={light ? "#fff" : "#16191d"}
+                  style={{ fill: light ? "var(--on-accent)" : "#16191d" }}
                 >
                   {shortName(g.name)}
                 </text>
@@ -297,7 +298,7 @@ function MapExplorer() {
                       width: `${((2 * r.pm) / maxShown) * 100}%`,
                     }}
                   />
-                  <span className="pt" style={{ left: `calc(${(r.count / maxShown) * 100}% - 1px)`, background: "var(--oi-blue)" }} />
+                  <span className="pt" style={{ left: `calc(${(r.count / maxShown) * 100}% - 1px)`, background: "var(--accent)" }} />
                 </div>
               </div>
             ) : (

@@ -24,11 +24,26 @@
   --shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 24px rgba(16, 24, 40, 0.06);
   --shadow-lg: 0 18px 50px rgba(16, 24, 40, 0.18);
 
-  /* Access-level colours */
+  /* Access-level colours — always Okabe–Ito, regardless of theme, so the
+     four disclosure levels stay a stable, colour-blind-safe legend. */
   --lv-none: #5b5b5b;
   --lv-partial: var(--oi-blue);
   --lv-public: var(--oi-green);
   --lv-court: var(--oi-vermillion);
+
+  /* ---- Theme accent tokens (DEFAULT: Black & Yellow) ----
+     --accent       solid accent fill (buttons, bars, marks, map shading)
+     --accent-rgb   same colour as r,g,b for rgba() alpha blends
+     --accent-text  readable accent colour for text/links on a light background
+     --on-accent    text colour placed on top of an --accent fill
+     The Okabe–Ito accessibility theme overrides these below. */
+  --accent: #ffcc00;
+  --accent-rgb: 255, 204, 0;
+  --accent-text: #8a6d00;
+  --on-accent: #1a1a1a;
+  --hero-from: #111418;
+  --hero-to: #2b2410;
+  --hero-ink: #ffffff;
 
   --radius: 14px;
   --radius-sm: 10px;
@@ -36,6 +51,18 @@
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
   --mono: "SF Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+}
+
+/* Accessibility theme: Okabe–Ito colour-blind-safe palette.
+   Activated via <html data-theme="okabe-ito"> (see the header toggle). */
+:root[data-theme="okabe-ito"] {
+  --accent: #0072b2;
+  --accent-rgb: 0, 114, 178;
+  --accent-text: #0072b2;
+  --on-accent: #ffffff;
+  --hero-from: #052a45;
+  --hero-to: #0072b2;
+  --hero-ink: #ffffff;
 }
 
 * {
@@ -57,7 +84,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 a {
-  color: var(--oi-blue);
+  color: var(--accent-text);
   text-decoration: none;
 }
 a:hover {
@@ -119,7 +146,7 @@ button {
   gap: 10px;
   font-weight: 800;
   letter-spacing: 0.14em;
-  color: var(--oi-blue);
+  color: var(--accent-text);
   font-size: 15px;
 }
 .brand .pillars {
@@ -152,6 +179,31 @@ button {
 .viewnav a:hover {
   text-decoration: none;
   color: var(--ink);
+}
+.theme-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--line-soft);
+  border-radius: 999px;
+  padding: 3px;
+}
+.theme-toggle button {
+  border: none;
+  background: none;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 5px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.theme-toggle button:hover {
+  color: var(--ink);
+}
+.theme-toggle button.active {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow);
 }
 
 .app-main {
@@ -256,9 +308,9 @@ button {
   transform: translateY(1px);
 }
 .btn-primary {
-  background: var(--oi-blue);
-  border-color: var(--oi-blue);
-  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
 }
 .btn-danger {
   background: var(--oi-vermillion);
@@ -418,7 +470,7 @@ button {
   font-size: 18px;
 }
 .phone .tabbar button.active {
-  color: var(--oi-blue);
+  color: var(--accent-text);
 }
 
 @media (max-width: 760px) {
@@ -606,7 +658,7 @@ button {
 
 /* ---------- Audit log ---------- */
 .log-item {
-  border-left: 3px solid var(--oi-blue);
+  border-left: 3px solid var(--accent);
   padding: 8px 0 8px 12px;
   margin-bottom: 12px;
 }
@@ -637,8 +689,8 @@ button {
 
 /* ---------- Stats / public view ---------- */
 .hero {
-  background: linear-gradient(135deg, #052a45 0%, #0072b2 100%);
-  color: #fff;
+  background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-to) 100%);
+  color: var(--hero-ink);
   border-radius: 18px;
   padding: 30px 26px;
 }
@@ -878,7 +930,7 @@ button {
   text-align: center;
 }
 .login input:focus {
-  border-color: var(--oi-blue);
+  border-color: var(--accent);
   outline: none;
 }
 .hint-chip {
@@ -941,8 +993,8 @@ button {
   color: var(--ink);
 }
 .tabs button.active {
-  color: var(--oi-blue);
-  border-bottom-color: var(--oi-blue);
+  color: var(--accent-text);
+  border-bottom-color: var(--accent);
 }
 .indiv-content {
   padding: 20px 18px 22px;
@@ -975,7 +1027,7 @@ button {
   top: 3px;
   height: 6px;
   border-radius: 999px;
-  background: rgba(0, 114, 178, 0.22);
+  background: rgba(var(--accent-rgb), 0.22);
 }
 .bar-ci .pt {
   position: absolute;
@@ -1045,13 +1097,13 @@ button {
   font-weight: 600;
 }
 .issue-tabs button:hover {
-  border-color: var(--oi-blue);
+  border-color: var(--accent);
   color: var(--ink);
 }
 .issue-tabs button.active {
-  background: var(--oi-blue);
-  border-color: var(--oi-blue);
-  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
 }
 
 /* Coarse regional choropleth. */
@@ -1085,10 +1137,10 @@ button {
   border: 1px solid var(--line);
 }
 .map-legend .swatch.grad {
-  background: rgba(0, 114, 178, 0.22);
+  background: rgba(var(--accent-rgb), 0.22);
 }
 .map-legend .swatch.grad-hi {
-  background: rgba(0, 114, 178, 0.9);
+  background: rgba(var(--accent-rgb), 0.9);
 }
 .map-legend .swatch.hatch {
   background: repeating-linear-gradient(45deg, #f1f3f6, #f1f3f6 3px, #c2c9d2 3px, #c2c9d2 5px);
@@ -1115,7 +1167,7 @@ button {
 }
 .method-list li {
   padding-left: 12px;
-  border-left: 2px solid var(--oi-blue);
+  border-left: 2px solid var(--accent);
 }
 .method-list .m-method {
   font-size: 13px;
