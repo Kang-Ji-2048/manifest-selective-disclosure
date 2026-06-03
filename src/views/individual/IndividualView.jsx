@@ -120,7 +120,7 @@ function LevelControl({ testimony }) {
       </div>
 
       {isCourt ? (
-        <div className="reveal" style={{ background: "#f6eef0", color: "var(--lv-court)" }}>
+        <div className="reveal" style={{ background: "rgba(213, 94, 0, 0.14)", color: "var(--lv-court)" }}>
           <b>Court disclosure is locked in.</b> This was a one-way decision and cannot be
           reversed from here — the named court already holds the sealed record.
         </div>

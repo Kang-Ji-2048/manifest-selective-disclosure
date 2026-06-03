@@ -174,8 +174,8 @@ function MapExplorer() {
           >
             <defs>
               <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                <rect width="6" height="6" fill="#f1f3f6" />
-                <line x1="0" y1="0" x2="0" y2="6" stroke="#c2c9d2" strokeWidth="2" />
+                <rect width="6" height="6" fill="transparent" />
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#9aa0a6" strokeWidth="2" />
               </pattern>
             </defs>
             {regionShapes.regions.map((g) => {
@@ -219,7 +219,7 @@ function MapExplorer() {
                   fontWeight="800"
                   textAnchor="middle"
                   pointerEvents="none"
-                  style={{ fill: light ? "var(--on-accent)" : "#16191d" }}
+                  style={{ fill: light ? "var(--on-accent)" : "var(--ink)" }}
                 >
                   {shortName(g.name)}
                 </text>
