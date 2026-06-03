@@ -507,3 +507,154 @@ export const attacks = [
   { id: "poison", name: "Poisoning", e: "Fakes planted to discredit a case", fix: "Cross-corroboration against independent evidence" },
   { id: "verifier", name: "Compromised verifiers", e: "Captured community reviewers", fix: "Non-communicating jury pool + revocable Hats roles" },
 ];
+
+// ---- Module 03 · Fund — campaigns ----
+// Each campaign has its own wallet; figures are illustrative, sourced to public
+// reporting. `geo` matches a country name in apacGeo.js for the radar silhouette.
+export const campaigns = [
+  {
+    id: "mm-junta",
+    country: "Myanmar",
+    flag: "🇲🇲",
+    status: "closed",
+    statusLabel: "Closed",
+    title: "Stop the junta's war on civilians",
+    tags: ["Myanmar", "Junta", "Jet fuel"],
+    blurb:
+      "Years after the 2021 coup, Myanmar's junta is running the deadliest year of aerial attacks yet. Amnesty is campaigning to suspend jet-fuel and weapons shipments and for the UN Security Council to refer the situation to the ICC.",
+    stats: [
+      { n: "7,000+", label: "civilians killed since coup", src: "Amnesty 2024" },
+      { n: "3.5M", label: "internally displaced", src: "UN OCHA 2025" },
+      { n: "85", label: "internet shutdowns 2025", src: "Access Now" },
+    ],
+  },
+  {
+    id: "my-sedition",
+    country: "Malaysia",
+    flag: "🇲🇾",
+    status: "obstructed",
+    statusLabel: "Obstructed",
+    title: "Repeal the Sedition Act 1948",
+    tags: ["Malaysia", "Free speech", "Sedition Act"],
+    blurb:
+      "Despite reform pledges, Malaysian authorities still use the colonial-era Sedition Act 1948 and the Communications and Multimedia Act to silence critics, journalists and student protesters. Amnesty is calling for full repeal.",
+    stats: [
+      { n: "5-yr", label: "high in sedition charges", src: "Suaram 2025" },
+      { n: "49%", label: "of complaints investigated", src: "2025" },
+      { n: "Obstructed", label: "civic space rating", src: "CIVICUS 2025" },
+    ],
+  },
+  {
+    id: "af-gender",
+    country: "Afghanistan",
+    flag: "🇦🇫",
+    status: "closed",
+    statusLabel: "Closed",
+    title: "End gender apartheid",
+    tags: ["Afghanistan", "Gender apartheid", "Taliban"],
+    blurb:
+      "Since the Taliban takeover, women and girls have been stripped of nearly all rights. Amnesty is campaigning for ‘gender apartheid’ to be codified as a crime against humanity in the UN draft Crimes Against Humanity Treaty.",
+    stats: [
+      { n: "22.9M", label: "need humanitarian aid", src: "UN OCHA 2025" },
+      { n: "2", label: "ICC arrest warrants", src: "2025" },
+      { n: "Closed", label: "civic space rating", src: "CIVICUS 2025" },
+    ],
+  },
+  {
+    id: "ph-drugwar",
+    country: "Philippines",
+    flag: "🇵🇭",
+    status: "repressed",
+    statusLabel: "Repressed",
+    title: "Justice for the war on drugs",
+    tags: ["Philippines", "ICC", "Drug war"],
+    blurb:
+      "Former president Duterte was surrendered to the ICC in 2025 and the Pre-Trial Chamber confirmed charges. Amnesty is campaigning for the Philippines to rejoin the Rome Statute and deliver domestic accountability.",
+    stats: [
+      { n: "~30,000", label: "killed in the drug war 2016–22", src: "Amnesty" },
+      { n: "8", label: "police convictions to date", src: "2025" },
+      { n: "149", label: "journalists killed 1986–2023", src: "CPJ" },
+    ],
+  },
+  {
+    id: "id-ite",
+    country: "Indonesia",
+    flag: "🇮🇩",
+    status: "obstructed",
+    statusLabel: "Obstructed",
+    title: "Drop the ITE Law charges",
+    tags: ["Indonesia", "ITE Law", "Prabowo"],
+    blurb:
+      "Following nationwide protests in 2025, Indonesian police detained thousands and charged activists under the ITE Law. Amnesty is demanding charges be dropped and the law's ‘rubber articles’ repealed.",
+    stats: [
+      { n: "4,000+", label: "detained Aug–Sep 2025", src: "Amnesty" },
+      { n: "983", label: "indicted under ITE since 2008", src: "SAFEnet" },
+      { n: "104", label: "digital attacks H1 2025", src: "SAFEnet" },
+    ],
+  },
+  {
+    id: "in-bulldozer",
+    country: "India",
+    flag: "🇮🇳",
+    status: "repressed",
+    statusLabel: "Repressed",
+    title: "Stop bulldozer injustice",
+    tags: ["India", "Bulldozer justice", "UAPA"],
+    blurb:
+      "State authorities continue demolishing homes, businesses and places of worship as collective punishment. Amnesty's campaign exposes the misuse of bulldozers and demands authorities halt punitive demolitions.",
+    stats: [
+      { n: "617", label: "structures razed in flashpoints", src: "Amnesty 2024" },
+      { n: "84", label: "internet shutdowns 2023", src: "Access Now" },
+      { n: "Obstructed", label: "civic space rating", src: "CIVICUS 2025" },
+    ],
+  },
+  {
+    id: "pk-peca",
+    country: "Pakistan",
+    flag: "🇵🇰",
+    status: "repressed",
+    statusLabel: "Repressed",
+    title: "Stop PECA surveillance",
+    tags: ["Pakistan", "PECA", "Disappeared"],
+    blurb:
+      "The 2025 PECA Amendment Act lets the state act as complainant against journalists and activists. Amnesty has documented surveillance technology imported from suppliers abroad, alongside continuing enforced disappearances in Balochistan and KP.",
+    stats: [
+      { n: "10,000+", label: "enforced disappearances", src: "Amnesty" },
+      { n: "4M", label: "intercept capacity (LIMS)", src: "2025" },
+      { n: "6", label: "journalists killed 2025", src: "CPJ" },
+    ],
+  },
+  {
+    id: "nz-tiriti",
+    country: "Aotearoa New Zealand",
+    geo: "New Zealand",
+    flag: "🇳🇿",
+    status: "narrowed",
+    statusLabel: "Narrowed",
+    title: "Toitū te Tiriti / defend Te Tiriti",
+    tags: ["Aotearoa", "Te Tiriti", "Indigenous"],
+    blurb:
+      "The 2023 coalition government's Treaty Principles Bill drew the Waitangi Tribunal's worst-breach finding in modern times. It was voted down in 2025, but a broader rollback of Māori rights remains the chapter's flagship issue.",
+    stats: [
+      { n: "~300K", label: "submissions on the Treaty Bill", src: "NZ Parliament" },
+      { n: "#1", label: "worst Te Tiriti breach in modern times", src: "Waitangi Tribunal" },
+      { n: "256K", label: "abuse-in-care survivors 2010–19", src: "Royal Commission" },
+    ],
+  },
+  {
+    id: "th-112",
+    country: "Thailand",
+    flag: "🇹🇭",
+    status: "repressed",
+    statusLabel: "Repressed",
+    title: "Repeal Article 112 / free protesters",
+    tags: ["Thailand", "Article 112", "Free speech"],
+    blurb:
+      "Thailand's lèse-majesté law carries 3–15 years per count. A 2025 amnesty bill explicitly excluded Article 112 cases. Amnesty is campaigning to drop all charges against peaceful protesters and ensure future amnesty laws cover Article 112.",
+    stats: [
+      { n: "1,962", label: "charged for protest 2020–25", src: "TLHR 2025" },
+      { n: "282", label: "Article 112 cases", src: "iLaw Jul 2025" },
+      { n: "286", label: "children charged", src: "TLHR" },
+    ],
+  },
+];

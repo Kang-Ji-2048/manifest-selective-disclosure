@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Routes, Route, NavLink, useLocation, Navigate } from "react-router-dom";
 import PublicView from "./views/public/PublicView.jsx";
 import HowView from "./views/how/HowView.jsx";
+import WitnessView from "./views/witness/WitnessView.jsx";
+import FundView from "./views/fund/FundView.jsx";
 import IndividualView from "./views/individual/IndividualView.jsx";
 import CourtView from "./views/court/CourtView.jsx";
 import { useMediaQuery } from "./hooks/useMediaQuery.js";
@@ -68,6 +70,12 @@ function Header() {
           <NavLink to="/how" className={({ isActive }) => (isActive ? "active" : "")}>
             How it works
           </NavLink>
+          <NavLink to="/witness" className={({ isActive }) => (isActive ? "active" : "")}>
+            Witness
+          </NavLink>
+          <NavLink to="/fund" className={({ isActive }) => (isActive ? "active" : "")}>
+            Fund
+          </NavLink>
           <NavLink to="/me" className={({ isActive }) => (isActive ? "active" : "")}>
             Individual
           </NavLink>
@@ -106,6 +114,8 @@ export default function App() {
           <Route path="/" element={<Navigate to="/public" replace />} />
           <Route path="/public" element={<PublicView />} />
           <Route path="/how" element={<HowView />} />
+          <Route path="/witness" element={<WitnessView />} />
+          <Route path="/fund" element={<FundView />} />
           <Route path="/me" element={<IndividualView />} />
           <Route path="/court" element={<CourtView />} />
           <Route path="*" element={<Navigate to="/public" replace />} />
