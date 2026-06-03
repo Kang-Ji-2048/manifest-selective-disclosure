@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="White duck">
+  <rect width="64" height="64" rx="14" fill="#000000"/>
+  <g fill="#ffffff">
+    <!-- tail -->
+    <path d="M13 39 q-7 -1 -10 -7 q8 -1 13 4 z"/>
+    <!-- body -->
+    <ellipse cx="29" cy="40" rx="20" ry="12"/>
+    <!-- head -->
+    <circle cx="44" cy="26" r="10"/>
+    <!-- beak -->
+    <path d="M53 23 q9 1 9 4 q0 3 -9 4 q-2 -4 0 -8 z"/>
+  </g>
+  <!-- eye -->
+  <circle cx="46" cy="24" r="1.9" fill="#000000"/>
+</svg>
