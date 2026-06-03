@@ -147,9 +147,9 @@ export const aggregate = {
   // Coarse admin-level breakdown. Counts are noised; `pm` is the 95% half-width.
   // The final cell falls below minCohort and is therefore suppressed downstream.
   regions: [
-    { name: "South Asia", count: 247, pm: 22, share: 0.47, proof: "sem:reg-A:1c…", events: 5 },
-    { name: "Southeast Asia", count: 134, pm: 18, share: 0.25, proof: "sem:reg-B:7a…", events: 3 },
-    { name: "East Asia", count: 79, pm: 14, share: 0.15, proof: "sem:reg-C:33…", events: 2 },
+    { name: "South Asia", count: 168, pm: 19, share: 0.31, proof: "sem:reg-A:1c…", events: 4 },
+    { name: "Southeast Asia", count: 263, pm: 24, share: 0.49, proof: "sem:reg-B:7a…", events: 5 },
+    { name: "East Asia", count: 38, pm: 10, share: 0.07, proof: "sem:reg-C:33…", events: 2 },
     { name: "Oceania", count: 52, pm: 12, share: 0.1, proof: "sem:reg-D:9e…", events: 2 },
     { name: "Pacific Islands", count: 11, pm: 7, share: 0.02, proof: "sem:reg-E:c4…", events: 1 },
   ],
@@ -232,10 +232,10 @@ export const issues = [
     blurb: "Forced dispersal of assemblies, crowd-control munitions, beatings.",
     total: { value: 174, pm: 20, mode: "pm", proof: "sem:iss-disp:7c…" },
     byRegion: [
-      { region: "South Asia", count: 92, pm: 14 },
-      { region: "Southeast Asia", count: 46, pm: 11 },
-      { region: "East Asia", count: 24, pm: 8 },
-      { region: "Oceania", count: 9, pm: 5 },
+      { region: "South Asia", count: 58, pm: 12 },
+      { region: "Southeast Asia", count: 92, pm: 14 },
+      { region: "East Asia", count: 10, pm: 5 },
+      { region: "Oceania", count: 14, pm: 6 },
       { region: "Pacific Islands", count: 0 },
     ],
     trend: {
@@ -256,10 +256,10 @@ export const issues = [
     blurb: "Arbitrary detention and disappearances at checkpoints and corridors.",
     total: { value: 138, pm: 18, mode: "pm", proof: "sem:iss-det:2a…" },
     byRegion: [
-      { region: "South Asia", count: 71, pm: 13 },
-      { region: "Southeast Asia", count: 38, pm: 10 },
-      { region: "East Asia", count: 18, pm: 7 },
-      { region: "Oceania", count: 11, pm: 6 },
+      { region: "South Asia", count: 44, pm: 11 },
+      { region: "Southeast Asia", count: 74, pm: 13 },
+      { region: "East Asia", count: 8, pm: 5 },
+      { region: "Oceania", count: 12, pm: 6 },
       { region: "Pacific Islands", count: 0 },
     ],
     trend: {
@@ -280,10 +280,10 @@ export const issues = [
     blurb: "Destruction of homes, premises and livelihoods.",
     total: { value: 92, pm: 15, mode: "pm", proof: "sem:iss-prop:9e…" },
     byRegion: [
-      { region: "South Asia", count: 48, pm: 11 },
-      { region: "Southeast Asia", count: 25, pm: 8 },
-      { region: "East Asia", count: 14, pm: 6 },
-      { region: "Oceania", count: 5, pm: 4 },
+      { region: "South Asia", count: 28, pm: 8 },
+      { region: "Southeast Asia", count: 49, pm: 11 },
+      { region: "East Asia", count: 6, pm: 4 },
+      { region: "Oceania", count: 9, pm: 5 },
       { region: "Pacific Islands", count: 0 },
     ],
     trend: {
@@ -304,10 +304,10 @@ export const issues = [
     blurb: "Obstruction of medical care and denial of access to the injured.",
     total: { value: 61, pm: 12, mode: "pm", proof: "sem:iss-med:41…" },
     byRegion: [
-      { region: "South Asia", count: 33, pm: 9 },
-      { region: "Southeast Asia", count: 21, pm: 7 },
-      { region: "East Asia", count: 7, pm: 4 },
-      { region: "Oceania", count: 0 },
+      { region: "South Asia", count: 21, pm: 7 },
+      { region: "Southeast Asia", count: 34, pm: 9 },
+      { region: "East Asia", count: 2, pm: 2 },
+      { region: "Oceania", count: 4, pm: 3 },
       { region: "Pacific Islands", count: 0 },
     ],
     trend: {
