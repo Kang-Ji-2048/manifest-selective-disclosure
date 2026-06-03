@@ -171,19 +171,51 @@ export const aggregate = {
 // A stylised, abstract admin map rendered locally as inline SVG — no map tiles,
 // no third-party CDN, no point/pin layer. Regions are shaded by their noised
 // count; cells below minCohort are suppressed (hatched), never jittered.
-// A stylised map of the Asia–Pacific (APAC) region, drawn as five coarse
-// sub-regions positioned roughly geographically (east = right, south = down).
-// Shapes are deliberately abstract — coarse sub-regional aggregation gives
+// The five coarse APAC sub-regions the dashboard aggregates into. The map is
+// drawn from real (low-res) country geometry in apacGeo.js, but every country
+// is shaded by its SUB-REGION's value — coarse sub-regional aggregation gives
 // larger k-anonymity cohorts than any country- or point-level map would.
 export const regionShapes = {
-  viewBox: "0 0 320 240",
   regions: [
-    { name: "South Asia", short: "S Asia", path: "M36,82 L118,74 L130,118 L84,160 L50,124 Z", lx: 80, ly: 112 },
-    { name: "East Asia", short: "E Asia", path: "M150,38 L214,26 L260,54 L252,98 L198,108 L158,84 Z", lx: 205, ly: 70 },
-    { name: "Southeast Asia", short: "SE Asia", path: "M140,116 L198,114 L230,142 L212,178 L150,172 L130,142 Z", lx: 178, ly: 148 },
-    { name: "Oceania", short: "Oceania", path: "M206,184 L288,180 L300,214 L244,232 L208,216 Z", lx: 250, ly: 208 },
-    { name: "Pacific Islands", short: "Pacific", path: "M288,102 L302,98 L308,112 L294,118 Z M298,130 L312,126 L317,140 L303,146 Z", lx: 302, ly: 166 },
+    { name: "South Asia", short: "S Asia" },
+    { name: "Southeast Asia", short: "SE Asia" },
+    { name: "East Asia", short: "E Asia" },
+    { name: "Oceania", short: "Oceania" },
+    { name: "Pacific Islands", short: "Pacific" },
   ],
+};
+
+// Maps each country in apacGeo.js to one of the five sub-regions above.
+export const COUNTRY_TO_REGION = {
+  India: "South Asia",
+  Pakistan: "South Asia",
+  Bangladesh: "South Asia",
+  "Sri Lanka": "South Asia",
+  Nepal: "South Asia",
+  Bhutan: "South Asia",
+  Afghanistan: "South Asia",
+  China: "East Asia",
+  Japan: "East Asia",
+  "South Korea": "East Asia",
+  "North Korea": "East Asia",
+  Mongolia: "East Asia",
+  Taiwan: "East Asia",
+  Indonesia: "Southeast Asia",
+  Malaysia: "Southeast Asia",
+  Thailand: "Southeast Asia",
+  Vietnam: "Southeast Asia",
+  Philippines: "Southeast Asia",
+  Myanmar: "Southeast Asia",
+  Cambodia: "Southeast Asia",
+  Laos: "Southeast Asia",
+  Brunei: "Southeast Asia",
+  Australia: "Oceania",
+  "New Zealand": "Oceania",
+  "Papua New Guinea": "Oceania",
+  Fiji: "Pacific Islands",
+  "Solomon Islands": "Pacific Islands",
+  Vanuatu: "Pacific Islands",
+  "New Caledonia": "Pacific Islands",
 };
 
 // ---- Per-issue statistics (Public view, funder drill-down) ----

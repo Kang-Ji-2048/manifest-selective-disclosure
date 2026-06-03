@@ -1,6 +1,63 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { aggregate, exemplars, themes, methodRefs, issues, regionShapes } from "../../data/mockData.js";
+import { aggregate, exemplars, themes, methodRefs, issues, regionShapes, COUNTRY_TO_REGION } from "../../data/mockData.js";
+import { apacGeo } from "../../data/apacGeo.js";
+
+// Project the bundled APAC country geometry into SVG space once, with a simple
+// equirectangular (plate carrée) projection fitted to the data's bounding box.
+// Each country carries its sub-region (for shading) and a centroid (for labels).
+const APAC = (() => {
+  const W = 360;
+  const pad = 6;
+  const polysOf = (geom) => (geom.type === "Polygon" ? [geom.coordinates] : geom.coordinates);
+  // Normalise the antimeridian: our data is all eastern-hemisphere except Fiji,
+  // which wraps to negative longitudes. Shift those past 180 so it stays contiguous.
+  const nlon = (lon) => (lon < 0 ? lon + 360 : lon);
+  let minLon = Infinity, maxLon = -Infinity, minLat = Infinity, maxLat = -Infinity;
+  for (const f of apacGeo.features) {
+    for (const poly of polysOf(f.geometry)) {
+      for (const ring of poly) {
+        for (const [lon, lat] of ring) {
+          const L = nlon(lon);
+          if (L < minLon) minLon = L;
+          if (L > maxLon) maxLon = L;
+          if (lat < minLat) minLat = lat;
+          if (lat > maxLat) maxLat = lat;
+        }
+      }
+    }
+  }
+  const scale = (W - 2 * pad) / (maxLon - minLon);
+  const H = (maxLat - minLat) * scale + 2 * pad;
+  const px = (lon) => pad + (lon - minLon) * scale;
+  const py = (lat) => pad + (maxLat - lat) * scale;
+  const countries = apacGeo.features.map((f) => {
+    let d = "";
+    let sx = 0, sy = 0, n = 0;
+    for (const poly of polysOf(f.geometry)) {
+      for (const ring of poly) {
+        ring.forEach(([lon, lat], i) => {
+          const x = px(nlon(lon)), y = py(lat);
+          d += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
+          sx += x; sy += y; n += 1;
+        });
+        d += "Z";
+      }
+    }
+    return { name: f.properties.name, region: COUNTRY_TO_REGION[f.properties.name] || null, d, cx: sx / n, cy: sy / n };
+  });
+  const labels = {};
+  for (const r of regionShapes.regions) {
+    const members = countries.filter((c) => c.region === r.name);
+    if (members.length) {
+      labels[r.name] = {
+        x: members.reduce((a, c) => a + c.cx, 0) / members.length,
+        y: members.reduce((a, c) => a + c.cy, 0) / members.length,
+      };
+    }
+  }
+  return { W, H: Math.round(H), countries, labels };
+})();
 
 // Fan chart: the noised month-level series with its 95% DP interval drawn as a
 // shaded band. Showing the uncertainty is both more honest and blurs the
@@ -166,10 +223,10 @@ function MapExplorer() {
             Where testimonies come from · Asia–Pacific {issue ? `· ${issue.name}` : ""}
           </div>
           <svg
-            viewBox={regionShapes.viewBox}
+            viewBox={`0 0 ${APAC.W} ${APAC.H}`}
             className="choropleth"
             role="group"
-            aria-label="Coarse regional choropleth of testimony counts"
+            aria-label="Choropleth of testimony counts across Asia–Pacific sub-regions"
           >
             <defs>
               <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -177,48 +234,60 @@ function MapExplorer() {
                 <line x1="0" y1="0" x2="0" y2="6" stroke="#9aa0a6" strokeWidth="2" />
               </pattern>
             </defs>
-            {regionShapes.regions.map((g) => {
-              const v = view.find((x) => x.name === g.name);
-              const intensity = v.state === "shown" ? v.count / maxShown : 0;
-              const fill =
-                v.state === "none"
-                  ? "var(--line-soft)"
-                  : v.state === "suppressed"
-                  ? "url(#hatch)"
-                  : `rgba(var(--accent-rgb),${0.2 + intensity * 0.7})`;
-              const isSel = region === g.name;
+            {APAC.countries.map((c) => {
+              const v = c.region ? view.find((x) => x.name === c.region) : null;
+              const intensity = v && v.state === "shown" ? v.count / maxShown : 0;
+              const fill = !v || v.state === "none"
+                ? "var(--line-soft)"
+                : v.state === "suppressed"
+                ? "url(#hatch)"
+                : `rgba(var(--accent-rgb),${0.2 + intensity * 0.7})`;
+              const isSel = v && region === c.region;
               return (
                 <path
-                  key={g.name}
-                  d={g.path}
-                  style={{ fill, stroke: isSel ? "var(--oi-vermillion)" : "#fff", strokeWidth: isSel ? 3 : 1.5 }}
-                  className="region-shape"
-                  onClick={() => setRegion(isSel ? null : g.name)}
-                  role="button"
-                  tabIndex={0}
+                  key={c.name}
+                  d={c.d}
+                  style={{
+                    fill,
+                    stroke: isSel ? "var(--oi-vermillion)" : "rgba(255,255,255,0.4)",
+                    strokeWidth: isSel ? 1.6 : 0.5,
+                  }}
+                  className={c.region ? "region-shape" : undefined}
+                  onClick={c.region ? () => setRegion(isSel ? null : c.region) : undefined}
+                  role={c.region ? "button" : undefined}
+                  tabIndex={c.region ? 0 : undefined}
                   aria-label={
-                    v.state === "shown"
-                      ? `${g.name}: ${v.count} ± ${v.pm}`
-                      : v.state === "suppressed"
-                      ? `${g.name}: fewer than ${k}, suppressed`
-                      : `${g.name}: no testimonies`
+                    v
+                      ? v.state === "shown"
+                        ? `${c.name} — ${c.region}: ${v.count} ± ${v.pm}`
+                        : v.state === "suppressed"
+                        ? `${c.name} — ${c.region}: fewer than ${k}, suppressed`
+                        : `${c.name} — ${c.region}: no testimonies`
+                      : c.name
                   }
                 />
               );
             })}
             {regionShapes.regions.map((g) => {
               const v = view.find((x) => x.name === g.name);
+              const pos = APAC.labels[g.name];
+              if (!pos) return null;
               const light = v.state === "shown" && v.count / maxShown > 0.5;
               return (
                 <text
                   key={`l-${g.name}`}
-                  x={g.lx}
-                  y={g.ly}
-                  fontSize="12"
+                  x={pos.x}
+                  y={pos.y}
+                  fontSize="10"
                   fontWeight="800"
                   textAnchor="middle"
                   pointerEvents="none"
-                  style={{ fill: light ? "var(--on-accent)" : "var(--ink)" }}
+                  style={{
+                    fill: light ? "var(--on-accent)" : "var(--ink)",
+                    paintOrder: "stroke",
+                    stroke: "rgba(0,0,0,0.5)",
+                    strokeWidth: 2.4,
+                  }}
                 >
                   {g.short}
                 </text>
@@ -235,7 +304,7 @@ function MapExplorer() {
 
           {selected ? (
             <div className="region-detail">
-              <b>{selected.name}</b>
+              <b>{selected.name}</b> <span className="faint">(all countries in this sub-region)</span>
               {selected.state === "shown" && (
                 <span className="muted">
                   {" "}
@@ -250,15 +319,16 @@ function MapExplorer() {
             </div>
           ) : (
             <div className="faint" style={{ fontSize: 12 }}>
-              Select a region for its figure. Shading is the DP-noised count; hatched regions fall
-              below the k-anonymity threshold and are suppressed, not estimated.
+              Click any country for its sub-region's figure. Every country is shaded by its
+              sub-region's DP-noised count; hatched sub-regions fall below the k-anonymity threshold
+              and are suppressed, not estimated.
             </div>
           )}
 
           <div className="faint" style={{ fontSize: 11.5 }}>
-            Coarse admin-level choropleth — no points, no pins, no jitter. Geography is aggregated
-            until each shown cell holds ≥ {k} contributors; the rest are dropped. Rendered locally
-            (no map tiles or third-party CDN).
+            Sub-regional choropleth on a real APAC map — no points, no pins, no jitter. Countries
+            share their sub-region's figure; a sub-region is shown only if it holds ≥ {k}
+            contributors, else suppressed. Geometry is bundled locally (no map tiles or CDN).
           </div>
         </div>
 
