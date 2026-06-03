@@ -1416,7 +1416,8 @@ button {
   margin-bottom: 6px;
 }
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   width: 100%;
   background: var(--bg);
   color: var(--ink);
@@ -1430,9 +1431,34 @@ button {
   resize: vertical;
 }
 .field input:focus,
-.field textarea:focus {
+.field textarea:focus,
+.field select:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+/* "Where this goes" mapping list */
+.goes-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+}
+.goes-list li {
+  display: flex;
+  gap: 10px;
+}
+.goes-k {
+  flex: 0 0 84px;
+  color: var(--accent-text);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  padding-top: 2px;
 }
 .field input::placeholder,
 .field textarea::placeholder {

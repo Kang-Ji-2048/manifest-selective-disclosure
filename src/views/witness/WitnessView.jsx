@@ -1,19 +1,30 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { issues, regionShapes, campaigns, COUNTRY_TO_REGION } from "../../data/mockData.js";
 
 // Everything here happens on the device. Nothing is sent to a server; the
 // exports are generated in the browser from the form state.
 export default function WitnessView() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ what: "", when: "", where: "", who: "" });
+  const [form, setForm] = useState({ category: "", region: "", what: "", when: "", where: "", who: "" });
   const [files, setFiles] = useState([]);
   const [receipt, setReceipt] = useState(null);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
+  // Structured taxonomy shared with the dashboard: a report is aggregated by
+  // issue category × region × month, exactly the axes the public figures use.
+  const issue = issues.find((i) => i.id === form.category) || null;
+  const monthLabel = new Date(form.when || Date.now()).toLocaleString("en-GB", { month: "long" });
+  const matchingCampaigns = form.region
+    ? campaigns.filter((c) => COUNTRY_TO_REGION[c.geo || c.country] === form.region)
+    : [];
+
   const buildRecord = () => ({
     module: "witness",
     schema: "manifest.ground-report.v1",
+    category: issue ? { id: issue.id, name: issue.name } : null,
+    region: form.region || null,
     whatHappened: form.what,
     when: form.when || null,
     where: form.where || null,
@@ -54,6 +65,8 @@ export default function WitnessView() {
   const exportPDF = () => {
     const r = buildRecord();
     const rows = [
+      ["Category", r.category ? r.category.name : "—"],
+      ["Region", r.region || "—"],
       ["What happened", r.whatHappened || "—"],
       ["When", r.when || "—"],
       ["Where", r.where || "—"],
@@ -94,13 +107,38 @@ export default function WitnessView() {
       </div>
 
       <div className="card pad stack report-form">
+        <div className="grid cols-2">
+          <label className="field">
+            <span className="field-label">Category — how it's counted</span>
+            <select value={form.category} onChange={set("category")}>
+              <option value="">Select a violation type…</option>
+              {issues.map((i) => (
+                <option key={i.id} value={i.id}>
+                  {i.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span className="field-label">Region — where it's counted</span>
+            <select value={form.region} onChange={set("region")}>
+              <option value="">Select a region…</option>
+              {regionShapes.regions.map((r) => (
+                <option key={r.name} value={r.name}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
         <label className="field">
-          <span className="field-label">What happened</span>
+          <span className="field-label">What happened — in your own words</span>
           <textarea
             rows={4}
             value={form.what}
             onChange={set("what")}
-            placeholder="Describe the event in factual terms."
+            placeholder="Describe the event in factual terms. This stays on your device; only the category, region and month above are ever counted."
           />
         </label>
 
@@ -163,6 +201,46 @@ export default function WitnessView() {
           <button className="btn btn-block" type="button" onClick={() => navigate("/fund")}>
             Create campaign from report →
           </button>
+        </div>
+      </div>
+
+      {/* How a single report becomes a statistic */}
+      <div className="card pad stack" style={{ background: "var(--bg)" }}>
+        <div className="eyebrow">Where this goes</div>
+        <p className="muted" style={{ margin: 0, fontSize: 13 }}>
+          Nothing is published yet. After independent verification, only the structured tags above
+          leave — your words, files and identity stay on your device. The report becomes a single{" "}
+          <b>anonymous count</b>, added through a one-way Semaphore nullifier that can never be
+          traced back to you, feeding the figures funders see:
+        </p>
+        <ul className="goes-list">
+          <li>
+            <span className="goes-k">Issue total</span>
+            <span>{issue ? issue.name : "— choose a category"}</span>
+          </li>
+          <li>
+            <span className="goes-k">Region</span>
+            <span>{form.region ? `${form.region} on the APAC map` : "— choose a region"}</span>
+          </li>
+          <li>
+            <span className="goes-k">Trend</span>
+            <span>the {monthLabel} point on the time series</span>
+          </li>
+          <li>
+            <span className="goes-k">Campaigns</span>
+            <span>
+              {form.region
+                ? matchingCampaigns.length
+                  ? matchingCampaigns.map((c) => c.country).join(", ")
+                  : "no active campaign in that region yet"
+                : "— choose a region"}
+            </span>
+          </li>
+        </ul>
+        <div className="faint" style={{ fontSize: 11.5 }}>
+          Counts are differentially private and obey a minimum-cohort rule: if fewer than 20 people
+          report the same issue in your region, it stays suppressed — shown only as “&lt; 20”, never
+          as a precise figure that could single you out.
         </div>
       </div>
     </div>
