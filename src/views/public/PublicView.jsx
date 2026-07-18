@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { aggregate, themes, methodRefs, issues, regionShapes, COUNTRY_TO_REGION } from "../../data/mockData.js";
 import { apacGeo } from "../../data/apacGeo.js";
@@ -173,9 +173,70 @@ function regionViewFor(issue) {
 // Interactive coarse choropleth + constrained issue drill-down.
 // No point/pin layer, no jitter — geography is aggregated to admin regions and
 // sub-threshold cells are suppressed. Rendered as local inline SVG (no tiles/CDN).
+// Clamp zoom (1–8x) and keep the panned content covering the viewport.
+function clampView(k, tx, ty) {
+  const kk = Math.min(8, Math.max(1, k));
+  const minTx = APAC.W * (1 - kk);
+  const minTy = APAC.H * (1 - kk);
+  return { k: kk, tx: Math.min(0, Math.max(minTx, tx)), ty: Math.min(0, Math.max(minTy, ty)) };
+}
+
 function MapExplorer() {
   const [issueId, setIssueId] = useState(null); // null = all issues
   const [region, setRegion] = useState(null);
+
+  // Pan/zoom state for the map. tx/ty/k transform the inner <g>.
+  const [zv, setZv] = useState({ k: 1, tx: 0, ty: 0 });
+  const svgRef = useRef(null);
+  const drag = useRef(null); // active pan gesture
+  const justDragged = useRef(false); // suppress the click that ends a drag
+
+  const toSvg = (clientX, clientY) => {
+    const rect = svgRef.current.getBoundingClientRect();
+    return { x: (clientX - rect.left) * (APAC.W / rect.width), y: (clientY - rect.top) * (APAC.H / rect.height) };
+  };
+  const zoomAt = (pt, factor) =>
+    setZv((v) => {
+      const k = Math.min(8, Math.max(1, v.k * factor));
+      const f = k / v.k;
+      return clampView(k, pt.x - f * (pt.x - v.tx), pt.y - f * (pt.y - v.ty));
+    });
+
+  // Wheel zoom (attached natively so we can preventDefault page scroll).
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return undefined;
+    const onWheel = (e) => {
+      e.preventDefault();
+      zoomAt(toSvg(e.clientX, e.clientY), e.deltaY < 0 ? 1.15 : 1 / 1.15);
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const onPointerDown = (e) => {
+    drag.current = { x: e.clientX, y: e.clientY, tx: zv.tx, ty: zv.ty, moved: false };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  const onPointerMove = (e) => {
+    if (!drag.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    if (Math.abs(e.clientX - drag.current.x) + Math.abs(e.clientY - drag.current.y) > 6) drag.current.moved = true;
+    const dx = (e.clientX - drag.current.x) * (APAC.W / rect.width);
+    const dy = (e.clientY - drag.current.y) * (APAC.H / rect.height);
+    setZv((v) => clampView(v.k, drag.current.tx + dx, drag.current.ty + dy));
+  };
+  const onPointerUp = () => {
+    if (drag.current) justDragged.current = drag.current.moved;
+    drag.current = null;
+  };
+  const selectRegion = (name, isSel) => {
+    if (justDragged.current) {
+      justDragged.current = false;
+      return;
+    }
+    setRegion(isSel ? null : name);
+  };
 
   const issue = issues.find((i) => i.id === issueId) || null;
   const view = regionViewFor(issue);
@@ -225,11 +286,18 @@ function MapExplorer() {
           <div className="eyebrow">
             Where testimonies come from · Asia–Pacific {issue ? `· ${issue.name}` : ""}
           </div>
+          <div className="map-stage">
           <svg
+            ref={svgRef}
             viewBox={`0 0 ${APAC.W} ${APAC.H}`}
             className="choropleth"
             role="group"
-            aria-label="Choropleth of testimony counts across Asia–Pacific sub-regions"
+            aria-label="Choropleth of testimony counts across Asia–Pacific sub-regions. Scroll or pinch to zoom, drag to pan."
+            style={{ cursor: drag.current ? "grabbing" : "grab", touchAction: "none" }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerLeave={onPointerUp}
           >
             <defs>
               <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -237,6 +305,7 @@ function MapExplorer() {
                 <line x1="0" y1="0" x2="0" y2="6" stroke="#9aa0a6" strokeWidth="2" />
               </pattern>
             </defs>
+            <g transform={`translate(${zv.tx} ${zv.ty}) scale(${zv.k})`}>
             {APAC.countries.map((c) => {
               const v = c.region ? view.find((x) => x.name === c.region) : null;
               const intensity = v && v.state === "shown" ? v.count / maxShown : 0;
@@ -256,7 +325,7 @@ function MapExplorer() {
                     strokeWidth: isSel ? 1.6 : 0.5,
                   }}
                   className={c.region ? "region-shape" : undefined}
-                  onClick={c.region ? () => setRegion(isSel ? null : c.region) : undefined}
+                  onClick={c.region ? () => selectRegion(c.region, isSel) : undefined}
                   role={c.region ? "button" : undefined}
                   tabIndex={c.region ? 0 : undefined}
                   aria-label={
@@ -294,7 +363,20 @@ function MapExplorer() {
                 </text>
               );
             })}
+            </g>
           </svg>
+          <div className="map-zoom">
+            <button type="button" aria-label="Zoom in" onClick={() => zoomAt({ x: APAC.W / 2, y: APAC.H / 2 }, 1.4)}>
+              +
+            </button>
+            <button type="button" aria-label="Zoom out" onClick={() => zoomAt({ x: APAC.W / 2, y: APAC.H / 2 }, 1 / 1.4)}>
+              −
+            </button>
+            <button type="button" aria-label="Reset zoom" onClick={() => setZv({ k: 1, tx: 0, ty: 0 })}>
+              ⤢
+            </button>
+          </div>
+          </div>
 
           <div className="map-legend">
             <span className="swatch grad" /> fewer →
